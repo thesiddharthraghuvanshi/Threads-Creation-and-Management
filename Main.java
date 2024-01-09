@@ -1,11 +1,22 @@
-// import static org.junit.jupiter.api.Assertions.assertEquals;
-
-// import org.junit.jupiter.api.Test;
+import java.util.concurrent.locks.*;
 
 class Main {
   public static void main(String[] args) {
+    
     //SharedResourceOfVariableExample();
+    
     //SharedResourceOfQueueExample();
+
+    //sharedResourceDeadLockExample();
+
+    //sharedResourceReentrantLockExample();
+
+    //sharedResourceReadWriteLockExample();
+
+    //sharedResourceStampedLockExample(); 
+
+    sharedResourceSemaphoreLockExample();
+    
   }
 
   private static void SharedResourceOfVariableExample() {
@@ -87,9 +98,87 @@ class Main {
     }
 
     System.out.println("Thread1 is suspended");
-    th1.suspend();
+    //th1.suspend();
 
     System.out.println("Main Thread is finishing it's work");
+  }
+
+  private static void sharedResourceReentrantLockExample() {
+
+    ReentrantLock lock = new ReentrantLock();
+    
+    SharedResourceReentrantLock resource1 = new SharedResourceReentrantLock();
+    Thread th1 = new Thread(() -> {
+      resource1.producer(lock);
+    });
+
+    SharedResourceReentrantLock resource2 = new SharedResourceReentrantLock();
+    Thread th2 = new Thread(() -> {
+      resource1.producer(lock);
+    });
+  }
+
+  private static void sharedResourceReadWriteLockExample() {
+    SharedResourceReadWriteLock resource = new SharedResourceReadWriteLock();
+    ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    Thread th1 = new Thread(() -> {
+      resource.producer(lock);
+    });
+
+    Thread th2 = new Thread(() -> {
+      resource.producer(lock);
+    });
+
+    SharedResourceReadWriteLock resource1 = new SharedResourceReadWriteLock();
+    Thread th3 = new Thread(() -> {
+      resource1.consumer(lock);
+    });
+
+    th1.start();
+    th2.start();
+    th3.start();
+  }
+
+  private static void sharedResourceStampedLockExample() {
+    SharedResourceStampedLock resource = new SharedResourceStampedLock();
+
+    Thread th1 = new Thread(() -> {
+      resource.produce();
+    });
+
+    Thread th2 = new Thread(() -> {
+      resource.consume();
+    });
+
+    th1.start();
+    th2.start();
+  }
+
+  private static void sharedResourceSemaphoreLockExample() {
+    SharedResourceSemaphoreLock resource = new SharedResourceSemaphoreLock();
+    
+    Thread th1 = new Thread(() -> {
+      resource.producer();
+    });
+    
+    Thread th2 = new Thread(() -> {
+      resource.producer();
+    });
+    
+    Thread th3 = new Thread(() -> {
+      resource.producer();
+    });
+    
+    Thread th4 = new Thread(() -> {
+      resource.producer();
+    });
+
+    th1.start();
+    th2.start();
+    th3.start();
+    th4.start();
+    
   }
 
   // @Test
